@@ -1,43 +1,49 @@
 import React,{ Component } from 'react'
 import videoPlay from './bg-video.mp4'
-import '../css/homepage.css'
-//import {Link} from 'react-router-dom'
+import '../../css/homepage.css'
+import {Link} from 'react-router-dom'
+import { withRouter, HashRouter } from 'react-router-dom'
 import {connect} from 'react-redux'
 //import {googleLogin} from '../actions/google'
 import { reduxForm } from 'redux-form';
 //import FacebookLogin from 'react-facebook-login';
 import GoogleLogin from 'react-google-login'
 //import {signup} from '../actions/signup'
-
+import { createUser } from '../../actions';
 //import axios from 'axios';
+//import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux'
+
 
 class HomePage extends Component {
     
-    constructor(props){
+    constructor(props) {
         super(props);
-        this.state={
-            redirect:false
+         this.state= {            
+            redirect: false
         }
     }
 
-
     render() {
 
-
-    var responseGoogle = (response) => {
-        let data ={
-            name: response.profileObj.name,
-            provider: response.Zi.idpId,
-            email: response.profileObj.email,
-            userId: response.profileObj.googleId,
-            token: response.Zi.accessToken
-
-           // provider:,
+        const responseGoogle = (response) => { // 
+            console.log(response)
+            let data = {
+                name: response.profileObj.name,
+                provider: response.Zi.idpId,
+                email: response.profileObj.email,
+                uId: response.profileObj.googleId,
+                token: response.Zi.access_token,
+                //provider: response.Zi.idpId
+            }
+            this.props.createUser(data);
+            this.props.history.push("/home/select_role");
+            // sessionStorage.setItem("data", JSON.stringify(response));
+            // this.setState({redirect: true});
         }
-        console.log(response);
-       // this.signup(response,'google');
-    }  
-
+        // if (this.state.redirect || sessionStorage.getItem('userData')) {
+        //     <Link to="/provider/provider_dashboard/index"></Link>
+        // }
 
         var TxtType = function (el, toRotate, period) {
             this.toRotate = toRotate;
@@ -93,9 +99,9 @@ class HomePage extends Component {
 
         return(
             <div className="nBar">
-                <nav class="navbar navbar-inverse">
-                <p class="navbar-text">DIBS SCHEDULING PLATFORM</p>
-                <ul class="nav navbar-nav">
+                <nav className="navbar navbar-inverse">
+                <p className="navbar-text">DIBS SCHEDULING PLATFORM</p>
+                <ul className="nav navbar-nav">
                   <li><a href="#">Link</a></li>
                   <li><a href="#">Link</a></li>
                 </ul>
@@ -104,7 +110,7 @@ class HomePage extends Component {
             <div className="video-container">   
            
                 <video className="bgvideo" autoPlay="true" loop>  
-                <div class="overlay-video"></div>                  
+                <div className="overlay-video"></div>                  
                     <source src={videoPlay} type="video/mp4" />
                 </video>
 
@@ -135,9 +141,26 @@ class HomePage extends Component {
     }
 }
 
+function mapStateToProps(state) {
+    return {
+        userData: state.userData
+    }
+}
+
+function mapDispatchToProps(dispatch){
+    return {
+        createUser: function (dispatch) {
+            createUser(dispatch);
+        }
+    }
+    // return bindActionCreators({
+    //     createUser:createUser
+    // }, dispatch)
+}
+
 export default reduxForm({      
    
 form:'googleSign'
 })(
-connect (null, {})(HomePage)
+connect (mapStateToProps,mapDispatchToProps)(HomePage)
 );

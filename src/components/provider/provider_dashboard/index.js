@@ -4,7 +4,7 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 //import logo from './logo.svg';
 //import './App.css';
 
-class  extends Component {
+class ProviderHome extends Component {
   render() {
     return(
     <MuiThemeProvider>
@@ -14,4 +14,4 @@ class  extends Component {
   }
 }
 
-export default App;
+export default ProviderHome;
