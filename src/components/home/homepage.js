@@ -1,8 +1,8 @@
 import React,{ Component } from 'react'
 import videoPlay from './bg-video.mp4'
 import '../../css/homepage.css'
-import {Link} from 'react-router-dom'
-import { withRouter, HashRouter } from 'react-router-dom'
+//import {Link} from 'react-router-dom'
+//import { withRouter, HashRouter } from 'react-router-dom'
 import {connect} from 'react-redux'
 //import {googleLogin} from '../actions/google'
 import { reduxForm } from 'redux-form';
@@ -12,7 +12,7 @@ import GoogleLogin from 'react-google-login'
 import { createUser } from '../../actions';
 //import axios from 'axios';
 //import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux'
+//import { bindActionCreators } from 'redux'
 
 
 class HomePage extends Component {
@@ -95,7 +95,7 @@ class HomePage extends Component {
                 }
             }
         };
-        const {handleSubmit} =this.props;
+       // const {handleSubmit} =this.props;
 
         return(
             <div className="nBar">
