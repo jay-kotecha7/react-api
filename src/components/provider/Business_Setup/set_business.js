@@ -5,11 +5,14 @@ import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
 import ExpandTransition from 'material-ui/internal/ExpandTransition';
 import MenuItem from 'material-ui/MenuItem'
-import SelectField from 'material-ui/SelectField'
+import Divider from 'material-ui/Divider';
 import Checkbox from 'material-ui/Checkbox'
 import { RadioButtonGroup } from 'material-ui/RadioButton'
 import TimePicker from 'material-ui/TimePicker';
 import Toggle from 'material-ui/Toggle';
+import {List, ListItem} from 'material-ui/List';
+import Subheader from 'material-ui/Subheader';
+import SelectField from 'material-ui/SelectField';
 
 import {
   Step,
@@ -27,9 +30,8 @@ const validate = values => {
     'days',
     'contact_number',
     'address'
-    // 'favoriteColor',
-    // 'notes'
   ]
+
   requiredFields.forEach(field => {
     if (!values[field]) {
       errors[field] = 'Required'
@@ -38,13 +40,13 @@ const validate = values => {
   if (
     values.email &&
     !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)
-  ) {
+  ){
     errors.email = 'Invalid email address'
   }
   return errors
 }
 
-const renderTextField = ({input, label, meta: {touched, error}, ...custom}) => (
+const renderTextField = ({input, label, meta: {touched, error}, ...custom}) => (         // Text Field Component
   <TextField
     hintText={label}
     floatingLabelText={label}
@@ -54,7 +56,7 @@ const renderTextField = ({input, label, meta: {touched, error}, ...custom}) => (
   />
 )
 
-const renderCheckbox = ({input, label}) => (
+const renderCheckbox = ({input, label}) => (                                            // CheckBox Component
   <Checkbox
     label={label}
     checked={input.value ? true : false}
@@ -62,7 +64,7 @@ const renderCheckbox = ({input, label}) => (
   />
 )
 
-const renderRadioGroup = ({input, ...rest}) => (
+const renderRadioGroup = ({input, ...rest}) => (                                        //Radio Buttons
   <RadioButtonGroup
     {...input}
     {...rest}
@@ -71,7 +73,7 @@ const renderRadioGroup = ({input, ...rest}) => (
   />
 )
 
-const renderSelectField = ({
+const renderSelectField = ({                                                            // Dropdown lists
   input,
   label,
   meta: {touched, error},
@@ -88,14 +90,52 @@ const renderSelectField = ({
   />
 )
 
+
+const days = [                                                                          // List of Days
+  {value:0, name:'Monday'},
+  {value:1, name:'Tuesday'},
+  {value:2, name:'Wednesday'},
+  {value:3, name:'Thursday'},
+  {value:4, name:'Friday'},
+  {value:5, name:'Saturday'},
+  {value:6, name:'Sunday'},
+];
+
+
 class SetupBusinessForm extends React.Component {
 
   state = {
-    loading: false,
+    loading: false,                                                                     // Initial state
     finished: false,
-    stepIndex: 0
-   // handleSubmit: 0
+    stepIndex: 0,
+    values:[]   // for working days
   };
+                      
+
+  selectionRenderer = (values) => {                                                    // for displaying days selected
+    switch(values.length){
+      case 0:
+        return '';
+      case 1:
+        return days[values[0]].name;
+      default:
+        return `${values.length} days selected`;
+    }
+  }
+
+  menuItems(days) {                                                                   // for displaying the list of days
+    const {values} = this.state;
+    return days.map((day) => (
+      
+      <MenuItem
+        key={day.value}
+        insetChildren={true}
+        checked={this.state.values && values.indexOf(day.value) > -1}
+        value={day.value}
+        primaryText={day.name}
+      />
+    ));
+  }
 
   dummyAsync = (cb) => {
     this.setState({loading: true}, () => {
@@ -116,10 +156,6 @@ class SetupBusinessForm extends React.Component {
     }
   };
 
-  // onSubmit(values){
-  //   console.log(values)
-  // }
-
   handlePrev = () => {
     //const { handleSubmit, pristine, reset, submitting } = this.state
     const {stepIndex} = this.state;
@@ -132,6 +168,7 @@ class SetupBusinessForm extends React.Component {
   };
 
   getStepContent(stepIndex) {
+   const {values} = this.state;
     switch (stepIndex) {
       case 0:
         return (
@@ -170,6 +207,7 @@ class SetupBusinessForm extends React.Component {
                   <MenuItem value="11" primaryText="11 AM" />
                 </Field>
               </div>
+
               <div>
                   <Field
                     name="close"
@@ -181,28 +219,23 @@ class SetupBusinessForm extends React.Component {
                   <MenuItem value="23" primaryText="11 PM" />
                 </Field>
               </div>
-              <div>
-                  <Field
-                    name="days"
-                    component={renderSelectField}
-                    label="Working Days"
-                  >
+
+             {/* <Divider /> */}
               
-                  <Toggle defaultToggled={true} label="Monday" value="monday"/>
-                  <Toggle defaultToggled={true} label="Tuesday" value="tuesday"/>
-                  <Toggle defaultToggled={true} label="Wednesday" value="wednesday"/>
-                  <Toggle defaultToggled={true} label="Thursday" value="thursday"/>
-                  <Toggle defaultToggled={true} label="Friday" value="friday"/>
-                  <Toggle defaultToggled={false} label="Saturday" value="saturday"/>
-                  <Toggle defaultToggled={false} label="Sunday" value="sunday"/>
-                  <RaisedButton         
-                    label="COOL"    
-                    primary={true}
-                   // onClick={handleS(this.handleNext.bind(this))}
-                  />
+                <div>
+                <Field
+                  name='days'
+                  multiple={true}
+                  label="Working Days"
+                  component={renderSelectField}
+                  //value={this.state.values}
+                  //onChange={this.handleChange}
+                  selectionRenderer={this.selectionRenderer}
+                >
+                  {this.menuItems(days)}
                 </Field>
-                
               </div>
+
               <div>
                   <Field
                     name="contact_number"
@@ -237,16 +270,26 @@ class SetupBusinessForm extends React.Component {
             <p>Something something whatever cool</p>
           </div>
         );
+
+
       case 2:
         return (
+          <div>
+          <div>
+            <Toggle
+              label="Cancellation Policy"
+              //style={styles.toggle}
+            />  
+          </div>
           <p>
             Try out different ad text to see what brings in the most customers, and learn how to
             enhance your ads using features like ad extensions. If you run into any problems with your
             ads, find out how to tell if they're running and how to resolve approval issues.
           </p>
+          </div>
         );
       default:
-        return 'You\'re a long way from home sonny jim!';
+        return 'You are a long way from home sonny jim!';
     }
   }
 
@@ -274,8 +317,8 @@ class SetupBusinessForm extends React.Component {
     }
 
     return (
-      
-      <form>
+
+      <form> 
         <div style={contentStyle}>
           <div>{this.getStepContent(stepIndex)}</div>
             <div style={{marginTop: 24, marginBottom: 12}}>
