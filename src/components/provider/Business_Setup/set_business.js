@@ -1,77 +1,49 @@
 import React from 'react'
-import {Field, reduxForm} from 'redux-form'
+import {Field, FieldArray, reduxForm} from 'redux-form'
 import TextField from 'material-ui/TextField'
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
 import ExpandTransition from 'material-ui/internal/ExpandTransition';
 import MenuItem from 'material-ui/MenuItem'
-import Divider from 'material-ui/Divider';
-import Checkbox from 'material-ui/Checkbox'
-import { RadioButtonGroup } from 'material-ui/RadioButton'
-import TimePicker from 'material-ui/TimePicker';
-import Toggle from 'material-ui/Toggle';
-import {List, ListItem} from 'material-ui/List';
-import Subheader from 'material-ui/Subheader';
+import FloatingActionButton from 'material-ui/FloatingActionButton';
+import ContentAdd from 'material-ui/svg-icons/content/add';
+//import FontIcon from 'material-ui/FontIcon';
+//import IconButton from 'material-ui/IconButton';
+//import ActionHome from 'material-ui/svg-icons/action/home';
+//import Divider from 'material-ui/Divider';
+//import Checkbox from 'material-ui/Checkbox'
+//import { RadioButtonGroup } from 'material-ui/RadioButton'
+//import TimePicker from 'material-ui/TimePicker';
+import Toggle from 'material-ui/Toggle';  
+//import {List, ListItem} from 'material-ui/List';
+//import Subheader from 'material-ui/Subheader';
 import SelectField from 'material-ui/SelectField';
-
+import validate from '../../validation'
 import {
   Step,
   Stepper,
   StepLabel,
 } from 'material-ui/Stepper';
 
-const validate = values => {
-  const errors = {}
-  const requiredFields = [
-    'business_name',
-    'business_category',
-    'open',
-    'close',
-    'days',
-    'contact_number',
-    'address'
-  ]
 
-  requiredFields.forEach(field => {
-    if (!values[field]) {
-      errors[field] = 'Required'
-    }
-  })
-  if (
-    values.email &&
-    !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)
-  ){
-    errors.email = 'Invalid email address'
-  }
-  return errors
-}
 
-const renderTextField = ({input, label, meta: {touched, error}, ...custom}) => (         // Text Field Component
-  <TextField
-    hintText={label}
-    floatingLabelText={label}
-    errorText={touched && error}
-    {...input}
-    {...custom}
-  />
-)
 
-const renderCheckbox = ({input, label}) => (                                            // CheckBox Component
-  <Checkbox
-    label={label}
-    checked={input.value ? true : false}
-    onCheck={input.onChange}
-  />
-)
+// const renderCheckbox = ({input, label}) => (                                            // CheckBox Component
+//   <Checkbox
+//     label={label}
+//     checked={input.value ? true : false}
+//     onCheck={input.onChange}
+//   />
+// )
 
-const renderRadioGroup = ({input, ...rest}) => (                                        //Radio Buttons
-  <RadioButtonGroup
-    {...input}
-    {...rest}
-    valueSelected={input.value}
-    onChange={(event, value) => input.onChange(value)}
-  />
-)
+// const renderRadioGroup = ({input, ...rest}) => (                                        //Radio Buttons
+//   <RadioButtonGroup
+//     {...input}
+//     {...rest}
+//     valueSelected={input.value}
+//     onChange={(event, value) => input.onChange(value)}
+//   /> 
+// )
 
 const renderSelectField = ({                                                            // Dropdown lists
   input,
@@ -90,6 +62,15 @@ const renderSelectField = ({                                                    
   />
 )
 
+const maxLength = max => value => value && value.length > max ? `Must be ${max} characters or less` : undefined
+const maxLength15 = maxLength(15)
+const minLength = min => value => value && value.length < min ? `Must be ${min} characters or more` : undefined
+const minLength10 = minLength(10)
+const minAddress = minAddress => value => value && value.length < minAddress ? `Must be ${minAddress} characters or more` : undefined
+const minAddress10 = minAddress(10)
+const minName = minName => value => value && value.length < minName ? `Must be ${minName} characters or more` : undefined
+const minName3 = minName(3)
+const number = value => value && isNaN(Number(value)) ? 'Must be a number' : undefined
 
 const days = [                                                                          // List of Days
   {value:0, name:'Monday'},
@@ -101,16 +82,61 @@ const days = [                                                                  
   {value:6, name:'Sunday'},
 ];
 
-
 class SetupBusinessForm extends React.Component {
 
   state = {
     loading: false,                                                                     // Initial state
     finished: false,
     stepIndex: 0,
-    values:[]   // for working days
+    values:[],   // for working days
   };
+
+
+ renderTextField = ({input, label, meta: {touched, error}, ...custom}) => (         // Text Field Component
+  <TextField
+    hintText={label}
+    floatingLabelText={label}
+    errorText={touched && error}
+    {...input}
+    {...custom}
+  />
+)
                       
+  renderService = ({ fields=[] ,  meta: { error } }) => (
+    <div>
+
+      <FloatingActionButton mini={true}>
+        <ContentAdd onClick={() => fields.push({})}/>
+      </FloatingActionButton>      
+      
+      {
+        fields.map((service,index) => (
+          <li key={index}>
+            <h4>Service {index + 1}</h4>
+            <Field
+              name={`${index}serviceName`}
+              //type="text"
+              component={this.renderTextField}
+              label="Sevice Name"
+              style={{marginRight: 12}}/>
+            <Field
+              name={`${index}serviceDuration`}
+              //type="text"
+              component={this.renderTextField}
+              label="Service Duration"
+              style={{marginRight: 12}}/>
+
+            <RaisedButton label="Delete" onClick={() => fields.remove(index)}>
+            </RaisedButton >
+          </li>
+      
+      ))
+      }
+  
+      {error && <li className="error">{error}</li>}
+    
+    </div>
+  )
 
   selectionRenderer = (values) => {                                                    // for displaying days selected
     switch(values.length){
@@ -137,6 +163,7 @@ class SetupBusinessForm extends React.Component {
     ));
   }
 
+  
   dummyAsync = (cb) => {
     this.setState({loading: true}, () => {
       this.asyncTimer = setTimeout(cb, 500);
@@ -168,7 +195,7 @@ class SetupBusinessForm extends React.Component {
   };
 
   getStepContent(stepIndex) {
-   const {values} = this.state;
+   //const {values} = this.state;
     switch (stepIndex) {
       case 0:
         return (
@@ -176,7 +203,8 @@ class SetupBusinessForm extends React.Component {
                 <div>
                   <Field
                     name="business_name"
-                    component={renderTextField}
+                    component={this.renderTextField}
+                    validate={[minName3]}
                     label="Business Name"
                   />
                 </div>
@@ -188,7 +216,7 @@ class SetupBusinessForm extends React.Component {
                     label="Business Category"
                   > 
                     <MenuItem value="clinic" primaryText="Clinic" />
-                    <MenuItem value="law" primaryText="law Firm" />
+                    <MenuItem value="law" primaryText="Law Firm" />
                     <MenuItem value="saloon" primaryText="Hair Saloon" />
                   </Field>
                 </div>
@@ -239,14 +267,16 @@ class SetupBusinessForm extends React.Component {
               <div>
                   <Field
                     name="contact_number"
-                    component={renderTextField}
+                    component={this.renderTextField}
+                    validate={[number,maxLength15,minLength10]}
                     label="Contact Number"
                   />
               </div>
               <div>
                   <Field
                     name="address"
-                    component={renderTextField}
+                    component={this.renderTextField}
+                    validate={[minAddress10]}
                     label="Address"
                   />
               </div>
@@ -257,16 +287,21 @@ class SetupBusinessForm extends React.Component {
         
         );
 
-
+      
       case 1:
         return (
           <div>
-            <TextField style={{marginTop: 0}} floatingLabelText="Ad group name" />
+            {/* <TextField style={{marginTop: 0}} floatingLabelText="Ad group name" /> */}
             <p>
-              Ad group status is different than the statuses for campaigns, ads, and keywords, though the
-              statuses can affect each other. Ad groups are contained within a campaign, and each campaign can
-              have one or more ad groups. Within each ad group are ads, keywords, and bids.
+              Please tell us about your Services
             </p>
+            <FieldArray
+              name="addService"
+              //type="text"
+              component={this.renderService}
+              //label="Add Service"
+            />
+            <br />
             <p>Something something whatever cool</p>
           </div>
         );
@@ -328,10 +363,20 @@ class SetupBusinessForm extends React.Component {
                 onClick={this.handlePrev}
                 style={{marginRight: 12}}
               />
-              <RaisedButton         
-                                                             // Next Button
-                label={stepIndex === 2 ? 'Finish' : 'Next'}    
+
+              <RaisedButton                                   // Clear 
+                label="Clear"
+                disabled={stepIndex===2||pristine || submitting}    
+                //primary={true}
+                onClick={reset}
+                style={{marginRight: 12}}
+              />
+
+              <RaisedButton                                     // Next Button
+                label={stepIndex === 2 ? 'Finish' : 'Next'}
+                disabled={pristine || submitting}    
                 primary={true}
+                //onClick={this.handleNext}
                 onClick={handleSubmit(this.handleNext.bind(this))}
               />
             </div>
