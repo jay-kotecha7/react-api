@@ -15,9 +15,7 @@ const validate = values => {
       '0serviceDuration',
       '1serviceDuration',
       '2serviceDuration',
-      'addService[0].serviceDuration',
-      'addService[1].serviceDuration',
-      'addService[2].serviceDuration',
+
     ]
   
     requiredFields.forEach(field => {

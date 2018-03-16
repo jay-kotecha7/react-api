@@ -1,31 +1,63 @@
 import React from 'react';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
-//import RaisedButton from 'material-ui/RaisedButton';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
-// import DatePicker from 'material-ui/DatePicker';
+import {connect} from 'react-redux'
+import { addRole,fetchUser } from '../../actions/index';
+import _ from 'lodash';
 
-/**
- * Dialogs can be nested. This example opens a Date Picker from within a Dialog.
- */
-export default class SelectRole extends React.Component {
-  state = {
-    open: true,
-    value: 0,
-  };
 
-//   handleOpen = () => {
-//     this.setState({open: true});
-//   };
+class SelectRole extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      open: true,
+      value: 0,   
+    };
+  }
+  
+  componentDidUpdate() {
+    this.props.fetchUser(this.props.userData.user.userId);
+  }
 
   handleClose = () => {
-    this.setState({open: false});
-  };
+    switch (this.state.value) {
+        case 1: {
+          var business_name = _.map(this.props.user, user1 => user1.business_name);
+          console.log('business_name)',business_name);
+          if(business_name=='') {
+            this.props.history.push('/provider/Business_Setup/set_business');
+          }else {
+            this.props.history.push('/home/Dummy');
+          }
+        break;
+        }
 
-  handleChange = (event, index, value) => this.setState({value});
+      case 2: {
+        this.props.history.push('/customer/CustomerDummy');
+        break;
+      }
+
+      default:
+      
+    }
+};
+
+  handleChange = (event, index, value) => {
+    var data= {
+      user_id:this.props.userData.user.userId,
+      role_id: value,
+    }
+
+      this.props.addRole(data);
+      this.setState({ value });
+  }
 
   render() {
+
+
+
     const actions = [
       <FlatButton
         label="Ok"
@@ -37,8 +69,6 @@ export default class SelectRole extends React.Component {
 
     return (
       <div>
-        {/* <RaisedButton label="WHO ARE YOU?" onClick={this.handleOpen} /> */}
-     
         <Dialog
           title="WHO ARE YOU?"
           actions={actions}
@@ -46,20 +76,34 @@ export default class SelectRole extends React.Component {
           open={this.state.open}
           onRequestClose={this.handleClose}
         >
-          {/* Open a Date Picker dialog from within a dialog. */}
           <SelectField
             floatingLabelText="Select Role"
             value={this.state.value}
             onChange={this.handleChange}
-        >
+          >
           <MenuItem value={0} primaryText="None" />
           <MenuItem value={1} primaryText="Provider" />
           <MenuItem value={2} primaryText="Customer" />
-          {/* <MenuItem value={4} primaryText="Weekends" />
-          <MenuItem value={5} primaryText="Weekly" /> */}
         </SelectField>
         </Dialog>
       </div>
     );
   }
 }
+const mapStateToProps = (state) => {
+ // console.log('in select role , redux state',state);
+    return {
+        userData: state.userData,
+        user: state.user
+    };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    addRole: addRole,
+    fetchUser:fetchUser
+  }
+}
+
+
+export default connect (mapStateToProps,mapDispatchToProps)(SelectRole);

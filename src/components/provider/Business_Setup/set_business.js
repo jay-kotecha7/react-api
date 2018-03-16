@@ -1,5 +1,5 @@
 import React from 'react'
-import {Field, FieldArray, reduxForm} from 'redux-form'
+import { Field, reduxForm, formValueSelector, FieldArray } from 'redux-form'
 import TextField from 'material-ui/TextField'
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
@@ -11,10 +11,10 @@ import ContentAdd from 'material-ui/svg-icons/content/add';
 //import IconButton from 'material-ui/IconButton';
 //import ActionHome from 'material-ui/svg-icons/action/home';
 //import Divider from 'material-ui/Divider';
-//import Checkbox from 'material-ui/Checkbox'
+import Checkbox from 'material-ui/Checkbox'
 //import { RadioButtonGroup } from 'material-ui/RadioButton'
 //import TimePicker from 'material-ui/TimePicker';
-import Toggle from 'material-ui/Toggle';  
+//import Toggle from 'material-ui/Toggle';  
 //import {List, ListItem} from 'material-ui/List';
 //import Subheader from 'material-ui/Subheader';
 import SelectField from 'material-ui/SelectField';
@@ -24,17 +24,35 @@ import {
   Stepper,
   StepLabel,
 } from 'material-ui/Stepper';
+// import _ from 'lodash';
+// import range from 'lodash/range'
+import { connect } from 'react-redux';
+import { setupBusiness } from "../../../actions/index";
+//import index from 'material-ui/Toggle';
+// const selector = formValueSelector('SetupBusinessForm');
 
 
-
-
-// const renderCheckbox = ({input, label}) => (                                            // CheckBox Component
-//   <Checkbox
-//     label={label}
-//     checked={input.value ? true : false}
-//     onCheck={input.onChange}
-//   />
-// )
+const renderTextField = ({input, label, meta: {touched, error}, ...custom}) => (         // Text Field Component
+  <TextField
+    hintText={label}
+    floatingLabelText={label}
+    errorText={touched && error}
+    {...input}
+    {...custom}
+    // onChange={(event,newValue)=> {
+    //   this.setState({
+    //     input: newValue
+    //   })
+    // }}
+  />
+)
+const renderCheckbox = ({input, label}) => (                                            // CheckBox Component
+  <Checkbox
+    label={label}
+    checked={input.value ? true : false}
+    onCheck={input.onChange}
+  />
+)
 
 // const renderRadioGroup = ({input, ...rest}) => (                                        //Radio Buttons
 //   <RadioButtonGroup
@@ -51,12 +69,18 @@ const renderSelectField = ({                                                    
   meta: {touched, error},
   children,
   ...custom
-}) => (
+  }) => (
   <SelectField
     floatingLabelText={label}
     errorText={touched && error}
     {...input}
-    onChange={(event, index, value) => input.onChange(value)}
+    onChange={(event, index, value,payload) => {
+      input.onChange(value)
+      // this.setState({
+      // input: payload
+      // })                              
+    }}
+
     children={children}
     {...custom}
   />
@@ -84,13 +108,23 @@ const days = [                                                                  
 
 class SetupBusinessForm extends React.Component {
 
+//   componentDidMount() {
+// console.log(JSON.stringify(this.props.business,null,4));
+//   }
   state = {
     loading: false,                                                                     // Initial state
     finished: false,
     stepIndex: 0,
     values:[],   // for working days
+    // business_name: '',
+    // business_category: '',
+    // start_hour: '',
+    // end_hour: '',
+    // week_days: '',
+    // contact_no: '',
+    // address: ''
   };
-
+  
 
  renderTextField = ({input, label, meta: {touched, error}, ...custom}) => (         // Text Field Component
   <TextField
@@ -100,29 +134,29 @@ class SetupBusinessForm extends React.Component {
     {...input}
     {...custom}
   />
-)
-                      
-  renderService = ({ fields=[] ,  meta: { error } }) => (
+)             
+  renderService = ({ fields=[] ,  meta: { error },values }) => (
     <div>
-
       <FloatingActionButton mini={true}>
         <ContentAdd onClick={() => fields.push({})}/>
       </FloatingActionButton>      
-      
-      {
-        fields.map((service,index) => (
-          <li key={index}>
+      { fields.map((service,index) => (
+          
+          <li key={index}{...values}>
+            
             <h4>Service {index + 1}</h4>
             <Field
-              name={`${index}serviceName`}
-              //type="text"
+              name={`${index}service_name`}
+              type="text"
               component={this.renderTextField}
               label="Sevice Name"
               style={{marginRight: 12}}/>
             <Field
-              name={`${index}serviceDuration`}
+              name={`${index}service_duration`}
+           
               //type="text"
               component={this.renderTextField}
+              validate={[number]}
               label="Service Duration"
               style={{marginRight: 12}}/>
 
@@ -132,11 +166,14 @@ class SetupBusinessForm extends React.Component {
       
       ))
       }
-  
+
       {error && <li className="error">{error}</li>}
     
     </div>
   )
+  
+  
+
 
   selectionRenderer = (values) => {                                                    // for displaying days selected
     switch(values.length){
@@ -162,7 +199,6 @@ class SetupBusinessForm extends React.Component {
       />
     ));
   }
-
   
   dummyAsync = (cb) => {
     this.setState({loading: true}, () => {
@@ -170,10 +206,9 @@ class SetupBusinessForm extends React.Component {
     });
   };
 
-  handleNext = () => {
-   // console.log(values);
-   //const { handleSubmit, pristine, reset, submitting } = this.state
-    const {stepIndex} = this.state;
+  handleNext = (valueSelected) => {
+    const { handleSubmit, pristine, reset, submitting } = this.state
+    const {stepIndex, finished} = this.state;
     if (!this.state.loading) {
       this.dummyAsync(() => this.setState({
         loading: false,
@@ -226,7 +261,7 @@ class SetupBusinessForm extends React.Component {
 
                 <div>
                   <Field
-                    name="open"
+                    name="start_hour"
                     component={renderSelectField}
                     label="Opening Hour"
                   >
@@ -238,7 +273,7 @@ class SetupBusinessForm extends React.Component {
 
               <div>
                   <Field
-                    name="close"
+                    name="end_hour"
                     component={renderSelectField}
                     label="Closing Hour"
                   >
@@ -252,7 +287,7 @@ class SetupBusinessForm extends React.Component {
               
                 <div>
                 <Field
-                  name='days'
+                  name='week_days'
                   multiple={true}
                   label="Working Days"
                   component={renderSelectField}
@@ -266,7 +301,7 @@ class SetupBusinessForm extends React.Component {
 
               <div>
                   <Field
-                    name="contact_number"
+                    name="contact_no"
                     component={this.renderTextField}
                     validate={[number,maxLength15,minLength10]}
                     label="Contact Number"
@@ -280,9 +315,6 @@ class SetupBusinessForm extends React.Component {
                     label="Address"
                   />
               </div>
-
-
-
             </div>
         
         );
@@ -298,9 +330,10 @@ class SetupBusinessForm extends React.Component {
             <FieldArray
               name="addService"
               //type="text"
-              component={this.renderService}
+              component={this.renderService} 
               //label="Add Service"
             />
+           
             <br />
             <p>Something something whatever cool</p>
           </div>
@@ -310,12 +343,21 @@ class SetupBusinessForm extends React.Component {
       case 2:
         return (
           <div>
-          <div>
-            <Toggle
+            <div>
+              <Field name="cancel" component={renderCheckbox} label="Cancellation Policy" />
+            </div>
+            {/* <Toggle
+              name="cancel"
               label="Cancellation Policy"
-              //style={styles.toggle}
-            />  
-          </div>
+              // style={styles.toggle}
+           
+            //   onToggle={(event, isInputChecked ) => {
+            //     console.log(this.props);
+            //     this.props.change('cancel',isInputChecked);
+            //  //   change('SetupBusinessForm','cancel', isInputChecked);            
+            //   }}
+            />   */}
+          
           <p>
             Try out different ad text to see what brings in the most customers, and learn how to
             enhance your ads using features like ad extensions. If you run into any problems with your
@@ -327,21 +369,57 @@ class SetupBusinessForm extends React.Component {
         return 'You are a long way from home sonny jim!';
     }
   }
-
+  
   renderContent() {
     //const { handleSubmit, pristine, reset, submitting } = this.state
     const {finished, stepIndex} = this.state;
+
     const contentStyle = {margin: '0 16px', overflow: 'hidden'};
-    const { handleSubmit, pristine, reset, submitting } = this.props
-    if (finished) {
+    const { handleSubmit, pristine, reset, submitting } = this.props;
+    console.log('finished ?? ', finished);
+    if(finished){
+      const {
+      business_name,
+        business_category,
+        contact_no,
+        start_hour,
+        end_hour,
+        week_days,
+        address,
+        cancel,
+       // addService,
+        service_name,
+        service_duration
+    } = this.props;
+      console.log('id:', this.props.userData.user.userId)
+      
+      const data = {
+        id : this.props.userData.user.userId,
+        business_name: business_name,
+        business_category: business_category,
+        contact_no: contact_no,
+        start_hour: start_hour,
+        end_hour: end_hour,
+        week_days: week_days,
+        address: address,
+        cancel: cancel,
+      //  addService: addService,
+        service_name: service_name,
+        service_duration: service_duration
+      }
+      console.log('push', data);
+      this.props.setupBusiness(data);
+    }
+    if (finished) {      
       return (
         <div style={contentStyle}>
           <p>
             <a
-              href="#"
-              onClick={(event) => {
+              href="/#"
+              onClick={(event,values) => {               
                 event.preventDefault();
                 this.setState({stepIndex: 0, finished: false});
+   
               }}
             >
               Click here
@@ -353,7 +431,7 @@ class SetupBusinessForm extends React.Component {
 
     return (
 
-      <form> 
+      <form className="form"> 
         <div style={contentStyle}>
           <div>{this.getStepContent(stepIndex)}</div>
             <div style={{marginTop: 24, marginBottom: 12}}>
@@ -376,8 +454,9 @@ class SetupBusinessForm extends React.Component {
                 label={stepIndex === 2 ? 'Finish' : 'Next'}
                 disabled={pristine || submitting}    
                 primary={true}
-                //onClick={this.handleNext}
+              //  onClick={this.handleNext}
                 onClick={handleSubmit(this.handleNext.bind(this))}
+                
               />
             </div>
         </div>
@@ -387,7 +466,6 @@ class SetupBusinessForm extends React.Component {
 
   render() {
     const {loading, stepIndex} = this.state;
-
     return (
       <div style={{width: '100%', maxWidth: 700, margin: 'auto'}}>
         <Stepper activeStep={stepIndex}>
@@ -409,10 +487,64 @@ class SetupBusinessForm extends React.Component {
   }
 }
 
+function mapDispatchToProps(dispatch) {
+  return {
+    setupBusiness: function(dispatch) {
+      setupBusiness(dispatch)
+    }
+  }
+}
+// export default reduxForm({
+//   form: 'SetupBusinessForm', // a unique identifier for this form
+//   validate,
+// })( connect(mapStateToProps,{})
+//   (SetupBusinessForm)
+// );
 
-
-export default reduxForm({
-  form: 'SetupBusinessForm', // a unique identifier for this form
-  validate,
-
+// Decorate with redux-form
+SetupBusinessForm = reduxForm({
+  form: 'SetupBusinessForm',validate
+   // a unique identifier for this form
 })(SetupBusinessForm)
+
+// Decorate with connect to read form values
+const selector = formValueSelector('SetupBusinessForm') // <-- same as form name
+
+//const getChild = _.property("${_}service_name");
+
+export default connect(state => { 
+ // can select values individually
+   console.log('reduxstate',state);
+  const business_name = selector(state, 'business_name')
+  const business_category = selector(state, 'business_category');
+  const start_hour = selector(state, 'start_hour');
+  const end_hour = selector(state, 'end_hour');
+  const week_days = selector(state, 'week_days');
+  const contact_no = selector(state, 'contact_no');
+  const address = selector(state, 'address');
+  const cancel = selector(state, 'cancel');
+  const addService = selector(state, 'addService');
+//  const service_name= addService && add.map((service_name,index)=> {
+//     return {service_name}+index;
+//   })
+//s  const service_name = addService && addService.map((index)=> {return index.id});
+  const service_name = selector(state, '0service_name');
+  const service_duration = selector(state,'0service_duration');
+  // const service_duration = selector(state, 'service_duration');
+ 
+  return {
+    business_name,
+    business_category,
+    start_hour,
+    end_hour,
+    week_days,
+    contact_no,
+    address,
+    cancel,
+    addService,
+    service_name,
+    service_duration,
+    userData: state.userData
+  }
+}
+,mapDispatchToProps)(SetupBusinessForm)

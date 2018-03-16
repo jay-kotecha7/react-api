@@ -1,7 +1,64 @@
-import React,{ Component } from 'react';
-import {Field, reduxForm} from 'redux-form';
+import React from 'react'
+import { Field, reduxForm, formValueSelector, FieldArray } from 'redux-form'
+import TextField from 'material-ui/TextField'
+import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
+import ExpandTransition from 'material-ui/internal/ExpandTransition';
+import MenuItem from 'material-ui/MenuItem'
+import FloatingActionButton from 'material-ui/FloatingActionButton';
+import ContentAdd from 'material-ui/svg-icons/content/add';
+//import FontIcon from 'material-ui/FontIcon';
+//import IconButton from 'material-ui/IconButton';
+//import ActionHome from 'material-ui/svg-icons/action/home';
+//import Divider from 'material-ui/Divider';
+import Checkbox from 'material-ui/Checkbox'
+//import { RadioButtonGroup } from 'material-ui/RadioButton'
 import DatePicker from 'material-ui/DatePicker';
-class BookAppointment extends Component{
+//import Toggle from 'material-ui/Toggle';  
+//import {List, ListItem} from 'material-ui/List';
+//import Subheader from 'material-ui/Subheader';
+import SelectField from 'material-ui/SelectField';
+import {
+    Step,
+    Stepper,
+    StepLabel,
+  } from 'material-ui/Stepper';
+
+
+const renderCheckbox = ({input, label}) => (                                            // CheckBox Component
+    <Checkbox
+      label={label}
+      checked={input.value ? true : false}
+      onCheck={input.onChange}
+    />
+  )
+
+const renderSelectField = ({                                                            // Dropdown lists
+    input,
+    label,
+    meta: {touched, error},
+    children,
+    ...custom
+}) => (
+        <SelectField
+            floatingLabelText={label}
+            errorText={touched && error}
+            {...input}
+            onChange={(event, index, value,payload) => {
+                input.onChange(value)
+            // this.setState({
+            // input: payload
+            // })                              
+            }}
+  
+            children={children}
+            {...custom}
+        />
+)
+
+
+
+class BookAppointment extends React.Component{
 
     constructor(props) {
         super(props);
@@ -10,7 +67,19 @@ class BookAppointment extends Component{
           controlledDate: null,
         };
       }
-    
+
+
+      renderTextField = ({input, label, meta: {touched, error}, ...custom}) => (         // Text Field Component
+        <TextField
+          hintText={label}
+          floatingLabelText={label}
+          errorText={touched && error}
+          {...input}
+          {...custom}
+        />
+      )  
+
+      
       handleChange = (event,date) => {
         this.setState({
           controlledDate: date,
@@ -24,28 +93,36 @@ class BookAppointment extends Component{
     };
 
     render(){
-        const { handleSubmit }= this.props;
+        const { handleSubmit,pristine,submitting }= this.props;
         return(
             <div>
                 <form onSubmit={handleSubmit(this.onSubmit.bind(this))}>
                     <div>
-                    <label>Select Service  </label>
-                    <Field name="SelectService" component="select">
-                        <option />
-                        <option name="service1" value="service1">Service 1</option>
-                        <option name="service2" value="service2">Service 2</option>
-                        <option name="service3" value="service3">Service 3</option>
+                    <div>Select Service</div>
+                    <Field
+                        name="business_category"
+                        component={renderSelectField}
+                        label="Business Category"
+                    > 
+                        <MenuItem value="clinic" primaryText="Clinic" />
+                        <MenuItem value="law" primaryText="Law Firm" />
+                        <MenuItem value="saloon" primaryText="Hair Saloon" />
                     </Field>
-                    <br /> 
-                    Select Date
+                    <div>Select Date</div>
                     <DatePicker 
-                        hintText="Controlled Date Input"
+                        hintText="Select Date"
                         value={this.state.controlledDate}
                         onChange={this.handleChange}
                         container="inline"
                     />
                     </div>
-                    <button type="submit">Submit</button>
+                    <RaisedButton                                     // Next Button
+                        label='Next'
+                        disabled={pristine || submitting}    
+                        primary={true}
+                        //  onClick={this.handleNext}
+                        //onClick={handleSubmit(this.handleNext.bind(this))}
+                    />
                 </form>
             </div>
         );
