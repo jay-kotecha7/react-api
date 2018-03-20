@@ -7,45 +7,27 @@ import ExpandTransition from 'material-ui/internal/ExpandTransition';
 import MenuItem from 'material-ui/MenuItem'
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
-//import FontIcon from 'material-ui/FontIcon';
-//import IconButton from 'material-ui/IconButton';
-//import ActionHome from 'material-ui/svg-icons/action/home';
-//import Divider from 'material-ui/Divider';
 import Checkbox from 'material-ui/Checkbox'
-//import { RadioButtonGroup } from 'material-ui/RadioButton'
-//import TimePicker from 'material-ui/TimePicker';
-//import Toggle from 'material-ui/Toggle';  
-//import {List, ListItem} from 'material-ui/List';
-//import Subheader from 'material-ui/Subheader';
 import SelectField from 'material-ui/SelectField';
-import validate from '../../validation'
+import validate from './validation'
 import {
   Step,
   Stepper,
   StepLabel,
 } from 'material-ui/Stepper';
-// import _ from 'lodash';
-// import range from 'lodash/range'
 import { connect } from 'react-redux';
-import { setupBusiness } from "../../../actions/index";
-//import index from 'material-ui/Toggle';
-// const selector = formValueSelector('SetupBusinessForm');
+import { setupBusiness } from "../../actions/index";
 
 
-const renderTextField = ({input, label, meta: {touched, error}, ...custom}) => (         // Text Field Component
-  <TextField
-    hintText={label}
-    floatingLabelText={label}
-    errorText={touched && error}
-    {...input}
-    {...custom}
-    // onChange={(event,newValue)=> {
-    //   this.setState({
-    //     input: newValue
-    //   })
-    // }}
-  />
-)
+// const renderTextField = ({input, label, meta: {touched, error}, ...custom}) => (         // Text Field Component
+//   <TextField
+//     hintText={label}
+//     floatingLabelText={label}
+//     errorText={touched && error}
+//     {...input}
+//     {...custom}
+//   />
+// )
 const renderCheckbox = ({input, label}) => (                                            // CheckBox Component
   <Checkbox
     label={label}
@@ -54,14 +36,6 @@ const renderCheckbox = ({input, label}) => (                                    
   />
 )
 
-// const renderRadioGroup = ({input, ...rest}) => (                                        //Radio Buttons
-//   <RadioButtonGroup
-//     {...input}
-//     {...rest}
-//     valueSelected={input.value}
-//     onChange={(event, value) => input.onChange(value)}
-//   /> 
-// )
 
 const renderSelectField = ({                                                            // Dropdown lists
   input,
@@ -75,10 +49,7 @@ const renderSelectField = ({                                                    
     errorText={touched && error}
     {...input}
     onChange={(event, index, value,payload) => {
-      input.onChange(value)
-      // this.setState({
-      // input: payload
-      // })                              
+      input.onChange(value)                        
     }}
 
     children={children}
@@ -108,21 +79,20 @@ const days = [                                                                  
 
 class SetupBusinessForm extends React.Component {
 
-//   componentDidMount() {
-// console.log(JSON.stringify(this.props.business,null,4));
-//   }
+  componentWillMount(){
+    if(!localStorage.jwtToken){
+        this.props.history.push('/');
+    }
+    else{
+        return null
+    }
+}
+
   state = {
     loading: false,                                                                     // Initial state
     finished: false,
     stepIndex: 0,
     values:[],   // for working days
-    // business_name: '',
-    // business_category: '',
-    // start_hour: '',
-    // end_hour: '',
-    // week_days: '',
-    // contact_no: '',
-    // address: ''
   };
   
 
@@ -207,8 +177,8 @@ class SetupBusinessForm extends React.Component {
   };
 
   handleNext = (valueSelected) => {
-    const { handleSubmit, pristine, reset, submitting } = this.state
-    const {stepIndex, finished} = this.state;
+    //const { handleSubmit, pristine, reset, submitting } = this.state
+    const {stepIndex} = this.state;
     if (!this.state.loading) {
       this.dummyAsync(() => this.setState({
         loading: false,
@@ -346,17 +316,6 @@ class SetupBusinessForm extends React.Component {
             <div>
               <Field name="cancel" component={renderCheckbox} label="Cancellation Policy" />
             </div>
-            {/* <Toggle
-              name="cancel"
-              label="Cancellation Policy"
-              // style={styles.toggle}
-           
-            //   onToggle={(event, isInputChecked ) => {
-            //     console.log(this.props);
-            //     this.props.change('cancel',isInputChecked);
-            //  //   change('SetupBusinessForm','cancel', isInputChecked);            
-            //   }}
-            />   */}
           
           <p>
             Try out different ad text to see what brings in the most customers, and learn how to
@@ -371,7 +330,6 @@ class SetupBusinessForm extends React.Component {
   }
   
   renderContent() {
-    //const { handleSubmit, pristine, reset, submitting } = this.state
     const {finished, stepIndex} = this.state;
 
     const contentStyle = {margin: '0 16px', overflow: 'hidden'};
@@ -494,12 +452,7 @@ function mapDispatchToProps(dispatch) {
     }
   }
 }
-// export default reduxForm({
-//   form: 'SetupBusinessForm', // a unique identifier for this form
-//   validate,
-// })( connect(mapStateToProps,{})
-//   (SetupBusinessForm)
-// );
+
 
 // Decorate with redux-form
 SetupBusinessForm = reduxForm({
@@ -510,7 +463,7 @@ SetupBusinessForm = reduxForm({
 // Decorate with connect to read form values
 const selector = formValueSelector('SetupBusinessForm') // <-- same as form name
 
-//const getChild = _.property("${_}service_name");
+
 
 export default connect(state => { 
  // can select values individually
@@ -524,13 +477,8 @@ export default connect(state => {
   const address = selector(state, 'address');
   const cancel = selector(state, 'cancel');
   const addService = selector(state, 'addService');
-//  const service_name= addService && add.map((service_name,index)=> {
-//     return {service_name}+index;
-//   })
-//s  const service_name = addService && addService.map((index)=> {return index.id});
   const service_name = selector(state, '0service_name');
   const service_duration = selector(state,'0service_duration');
-  // const service_duration = selector(state, 'service_duration');
  
   return {
     business_name,

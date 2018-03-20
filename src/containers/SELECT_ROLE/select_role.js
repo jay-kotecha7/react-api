@@ -7,8 +7,10 @@ import {connect} from 'react-redux'
 import { addRole,fetchUser } from '../../actions/index';
 import _ from 'lodash';
 
+// import { withRouter } from "react-router-dom";
 
-class SelectRole extends React.Component {
+class SelectRoleContainer extends React.Component {
+
   constructor() {
     super();
     this.state = {
@@ -16,16 +18,18 @@ class SelectRole extends React.Component {
       value: 0,   
     };
   }
-  
-  componentDidUpdate() {
-    this.props.fetchUser(this.props.userData.user.userId);
-  }
+
+    componentWillMount(){
+      console.log('loginData ',this.props.userData)
+      this.props.fetchUser(this.props.userData.user.userId);
+    }
 
   handleClose = () => {
+
     switch (this.state.value) {
         case 1: {
           var business_name = _.map(this.props.user, user1 => user1.business_name);
-          console.log('business_name)',business_name);
+          console.log('business_name: ',business_name);
           if(business_name=='') {
             this.props.history.push('/provider/Business_Setup/set_business');
           }else {
@@ -35,7 +39,7 @@ class SelectRole extends React.Component {
         }
 
       case 2: {
-        this.props.history.push('/customer/CustomerDummy');
+        this.props.history.push('/customer/customer_dashboard/customer_homepage');
         break;
       }
 
@@ -91,7 +95,6 @@ class SelectRole extends React.Component {
   }
 }
 const mapStateToProps = (state) => {
- // console.log('in select role , redux state',state);
     return {
         userData: state.userData,
         user: state.user
@@ -106,4 +109,4 @@ function mapDispatchToProps(dispatch) {
 }
 
 
-export default connect (mapStateToProps,mapDispatchToProps)(SelectRole);
+export default connect (mapStateToProps,mapDispatchToProps)(SelectRoleContainer);

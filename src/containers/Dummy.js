@@ -1,10 +1,16 @@
 import React from 'react';
-// import {Link} from 'react-router-dom';
-// import {connect} from 'react-redux'
 
 
 export default class Dummy extends React.Component{
 
+    componentWillMount(){
+        if(!localStorage.jwtToken){
+            this.props.history.push('/');
+        }
+        else{
+            return null
+        }
+    }
 
     render(){
         return (

@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "antd": "^3.3.0",
     "async": "^2.6.0",
     "axios": "^0.18.0",
     "jsonwebtoken": "^8.2.0",
@@ -10,6 +11,7 @@
     "jwt-simple": "^0.5.1",
     "lodash": "^4.17.5",
     "material-ui": "^0.20.0",
+    "moment": "^2.21.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-google-login": "^3.0.4",
@@ -19,6 +21,7 @@
     "react-router-dom": "^4.2.2",
     "react-router-redux": "^4.0.8",
     "react-scripts": "1.1.1",
+    "react-timeslot-calendar": "^0.2.0",
     "redux": "^3.7.2",
     "redux-form": "^7.2.3",
     "redux-logger": "^3.0.6",
@@ -30,5 +33,9 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
+  },
+  "devDependencies": {},
+  "optionalDependencies": {
+    "dtrace-provider": "^0.8.6"
   }
 }

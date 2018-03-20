@@ -4,10 +4,10 @@ import '../../css/homepage.css'
 import {connect} from 'react-redux'
 import GoogleLogin from 'react-google-login'
 import { createUser} from '../../actions/index';
-import { bindActionCreators } from "redux";
 
 
 class HomePage extends Component {
+
 
     render() {
 
@@ -79,6 +79,17 @@ class HomePage extends Component {
 
         return(
             <div className="nBar">
+                <nav className="navbar navbar-inverse">
+                    <div className="container-fluid">
+                        <div className="navbar-header">
+                            <div className='navbar-brand'> DIBS SCHEDULING PLATFORM </div>
+
+                        </div>
+                        <div className="collapse navbar-collapse">
+                        </div>
+                    </div>
+                </nav>
+
             <div className="video-container">   
            
                 <video className="bgvideo" autoPlay="true" loop>  
@@ -118,6 +129,7 @@ function mapDispatchToProps(){
     console.log('Mapping createUser action to component HomePage')
     return {
         createUser: createUser,
+
     }
 }
 

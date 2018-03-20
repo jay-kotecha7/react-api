@@ -11,8 +11,6 @@ const url=`http://localhost:1337`
 
 
 export function setCurrentUser(user){
-   // console.log('set current user');
-  //  console.log('Before Action SET_CURRENT_USER')
     return {
         type: SET_CURRENT_USER,
         user
@@ -76,6 +74,7 @@ export function logout(){
     return dispatch => {
         localStorage.removeItem('jwtToken');
         setAuthorizationToken(false);
+       // this.props.history.push('/');
         store.dispatch(setCurrentUser({}));
     }
 }
