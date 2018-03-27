@@ -6,8 +6,8 @@ export default function LoginReducer(state={ isAuthenticated : false, user:{}}, 
 
         
         case SET_CURRENT_USER: {
-           // console.log('Inside Case set current user', localStorage.getItem('jwtToken'))
-           // console.log('action-user', action.user)
+           console.log('Inside Case set current user', localStorage.getItem('jwtToken'))
+           console.log('action-user', action.user)
             return {
             isAuthenticated: localStorage.getItem('jwtToken') ? true : false,
             user: action.user

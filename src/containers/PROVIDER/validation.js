@@ -4,10 +4,10 @@ const validate = values => {
     const requiredFields = [
       'business_name',
       'business_category',
-      'open',
-      'close',
-      'days',
-      'contact_number',
+      'start_hour',
+      'end_hour',
+      'week_days',
+      'contact_no',
       'address',
       '0serviceName',
       '1serviceName',
@@ -17,7 +17,9 @@ const validate = values => {
       '2serviceDuration',
 
     ]
-  
+
+
+
     requiredFields.forEach(field => {
       if (!values[field]) {
         errors[field] = 'Required'

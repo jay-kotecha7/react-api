@@ -12,7 +12,8 @@ export default function(state=[], action) {
         }
 
         case FETCH_USERS: {
-            return _.mapKeys(action.payload.data, 'userId');
+            return _.first(action.payload.data)
+            //return _.mapKeys(action.payload.data, 'userId');
             // return [...state,action.payload.data];
         }
 

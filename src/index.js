@@ -5,7 +5,7 @@ import {Provider} from 'react-redux';
 import thunk from 'redux-thunk';
 import HomePage from './components/home/homepage'
 import SelectRole from './components/Select_Role/index'
-import Dummy from './containers/Dummy'
+import Dummy from './components/Dummy/index'
 import BookAppointmentComponent from './components/customer/Customer_BookApp/index'
 import registerServiceWorker from './registerServiceWorker';
 import SetupBusinessFormComponent from './components/provider/Setup_Business/index';
@@ -20,7 +20,6 @@ import jwt_decode from 'jwt-decode';
 import CustomerHomepageComponent from './components/customer/Customer_DashBoard/index';
 
 
-
 export const store = createStore(
   rootReducer,
   window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__(),
@@ -32,24 +31,15 @@ if(localStorage.jwtToken){
     store.dispatch(setCurrentUser(jwt_decode(localStorage.jwtToken)));
 }
 
-// function ensure(){
-//     console.log('inside Ensure')
-//     if(!localStorage.jwtToken){
-//         <Redirect to="/" />
-//     }
-//     else{
-//         return null
-//     }
-// }
 
 ReactDOM.render(
 <Provider store={store}>
-    <MuiThemeProvider>
+    <MuiThemeProvider >
         <BrowserRouter >
             <div>
                 {/* <NavigationBar /> */}
                     <Switch>
-                        <Route path="/home/select_role" component={SelectRole} />
+                        <Route path="/home/select_role" component={SelectRole} refresh="true" />
                         <Route path="/home/Dummy" component={Dummy} refresh="true"/>
                         <Route path="/provider/Business_Setup/set_business" component={SetupBusinessFormComponent} />
                         <Route path="/customer/book_app" component={BookAppointmentComponent} />

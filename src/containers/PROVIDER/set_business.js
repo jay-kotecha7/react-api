@@ -17,17 +17,22 @@ import {
 } from 'material-ui/Stepper';
 import { connect } from 'react-redux';
 import { setupBusiness } from "../../actions/index";
+import { Card, CardActions, CardHeader, CardMedia, CardTitle, CardText } from 'material-ui/Card';
+import _ from 'lodash';
+import TimePicker from 'material-ui/TimePicker';
+
+const maxLength = max => value => value && value.length > max ? `Must be ${max} characters or less` : undefined
+const maxLength15 = maxLength(15)
+const minLength = min => value => value && value.length < min ? `Must be ${min} characters or more` : undefined
+const minLength10 = minLength(10)
+const minAddress = minAddress => value => value && value.length < minAddress ? `Must be ${minAddress} characters or more` : undefined
+const minAddress10 = minAddress(10)
+const minName = minName => value => value && value.length < minName ? `Must be ${minName} characters or more` : undefined
+const minName3 = minName(3)
+const number = value => value && isNaN(Number(value)) ? 'Must be a number' : undefined
 
 
-// const renderTextField = ({input, label, meta: {touched, error}, ...custom}) => (         // Text Field Component
-//   <TextField
-//     hintText={label}
-//     floatingLabelText={label}
-//     errorText={touched && error}
-//     {...input}
-//     {...custom}
-//   />
-// )
+
 const renderCheckbox = ({input, label}) => (                                            // CheckBox Component
   <Checkbox
     label={label}
@@ -35,7 +40,6 @@ const renderCheckbox = ({input, label}) => (                                    
     onCheck={input.onChange}
   />
 )
-
 
 const renderSelectField = ({                                                            // Dropdown lists
   input,
@@ -56,16 +60,6 @@ const renderSelectField = ({                                                    
     {...custom}
   />
 )
-
-const maxLength = max => value => value && value.length > max ? `Must be ${max} characters or less` : undefined
-const maxLength15 = maxLength(15)
-const minLength = min => value => value && value.length < min ? `Must be ${min} characters or more` : undefined
-const minLength10 = minLength(10)
-const minAddress = minAddress => value => value && value.length < minAddress ? `Must be ${minAddress} characters or more` : undefined
-const minAddress10 = minAddress(10)
-const minName = minName => value => value && value.length < minName ? `Must be ${minName} characters or more` : undefined
-const minName3 = minName(3)
-const number = value => value && isNaN(Number(value)) ? 'Must be a number' : undefined
 
 const days = [                                                                          // List of Days
   {value:0, name:'Monday'},
@@ -93,6 +87,8 @@ class SetupBusinessForm extends React.Component {
     finished: false,
     stepIndex: 0,
     values:[],   // for working days
+    start_hour:null,
+    end_hour:null
   };
   
 
@@ -104,6 +100,16 @@ class SetupBusinessForm extends React.Component {
     {...input}
     {...custom}
   />
+ )
+  renderTimePicker = ({input, label, meta: {touched, error}, ...custom, value}) => (         // Text Field Component
+    <TimePicker
+      hintText={label}
+      floatingLabelText={label}
+      errorText={touched && error}
+      {...input}
+      {...custom}
+      onChange={(event,value) => input.onChange(value)}
+    />
 )             
   renderService = ({ fields=[] ,  meta: { error },values }) => (
     <div>
@@ -116,13 +122,13 @@ class SetupBusinessForm extends React.Component {
             
             <h4>Service {index + 1}</h4>
             <Field
-              name={`${index}service_name`}
+              name={`${service}service_name`}
               type="text"
               component={this.renderTextField}
               label="Sevice Name"
               style={{marginRight: 12}}/>
             <Field
-              name={`${index}service_duration`}
+              name={`${service}service_duration`}
            
               //type="text"
               component={this.renderTextField}
@@ -199,6 +205,19 @@ class SetupBusinessForm extends React.Component {
     }
   };
 
+  handleEndTime = (event,value) =>{
+    const  {end_hour} = this.state;
+    this.setState({
+      end_hour : value
+    });
+    console.log('END HOUR',end_hour)
+  }
+  handleStartTime = (event,value) =>{
+    const  {start_hour} = this.state;
+    this.setState({
+      start_hour : value
+    });
+  }
   getStepContent(stepIndex) {
    //const {values} = this.state;
     switch (stepIndex) {
@@ -210,7 +229,7 @@ class SetupBusinessForm extends React.Component {
                     name="business_name"
                     component={this.renderTextField}
                     validate={[minName3]}
-                    label="Business Name"
+                    label="Business Name" 
                   />
                 </div>
 
@@ -220,37 +239,32 @@ class SetupBusinessForm extends React.Component {
                     component={renderSelectField}
                     label="Business Category"
                   > 
-                    <MenuItem value="clinic" primaryText="Clinic" />
-                    <MenuItem value="law" primaryText="Law Firm" />
-                    <MenuItem value="saloon" primaryText="Hair Saloon" />
+                    <MenuItem value="Clinic" primaryText="Clinic" />
+                    <MenuItem value="Law" primaryText="Law Firm" />
+                    <MenuItem value="Salon" primaryText="Hair Saloon" />
                   </Field>
                 </div>
 
-
                 {/* <div>Business Hours</div> */}
-
                 <div>
-                  <Field
-                    name="start_hour"
-                    component={renderSelectField}
-                    label="Opening Hour"
-                  >
-                  <MenuItem value="9" primaryText="9 AM" />
-                  <MenuItem value="10" primaryText="10 AM" />
-                  <MenuItem value="11" primaryText="11 AM" />
-                </Field>
+                <Field
+                  name="start_hour"
+                  label="Start Hour"
+                  floatingLabelText="Start Hour"
+                  component={this.renderTimePicker}
+                  //onClick={this.handleStartTime}
+                  minutesStep={30}
+                />
               </div>
 
               <div>
-                  <Field
-                    name="end_hour"
-                    component={renderSelectField}
-                    label="Closing Hour"
-                  >
-                  <MenuItem value="21" primaryText="9 PM" />
-                  <MenuItem value="22" primaryText="10 PM" />
-                  <MenuItem value="23" primaryText="11 PM" />
-                </Field>
+              <Field
+                  name="end_hour"
+                  label="End Hour"
+                  floatingLabelText="End Hour"
+                  component={this.renderTimePicker}
+                  minutesStep={30}
+                />
               </div>
 
              {/* <Divider /> */}
@@ -259,7 +273,7 @@ class SetupBusinessForm extends React.Component {
                 <Field
                   name='week_days'
                   multiple={true}
-                  label="Working Days"
+                  label="Non Working Days"
                   component={renderSelectField}
                   //value={this.state.values}
                   //onChange={this.handleChange}
@@ -328,8 +342,17 @@ class SetupBusinessForm extends React.Component {
         return 'You are a long way from home sonny jim!';
     }
   }
+
+
+  handleFinalSubmit = (values) => {
+    const data ={
+      id:this.props.userData.user.userId,
+      values:values
+    }
+    this.props.setupBusiness(data,()=>{this.props.history.push("/home/Dummy")});
+   }
   
-  renderContent() {
+   renderContent() {
     const {finished, stepIndex} = this.state;
 
     const contentStyle = {margin: '0 16px', overflow: 'hidden'};
@@ -345,44 +368,42 @@ class SetupBusinessForm extends React.Component {
         week_days,
         address,
         cancel,
-       // addService,
-        service_name,
-        service_duration
     } = this.props;
-      console.log('id:', this.props.userData.user.userId)
-      
-      const data = {
-        id : this.props.userData.user.userId,
-        business_name: business_name,
-        business_category: business_category,
-        contact_no: contact_no,
-        start_hour: start_hour,
-        end_hour: end_hour,
-        week_days: week_days,
-        address: address,
-        cancel: cancel,
-      //  addService: addService,
-        service_name: service_name,
-        service_duration: service_duration
-      }
-      console.log('push', data);
-      this.props.setupBusiness(data);
-    }
-    if (finished) {      
+  
       return (
         <div style={contentStyle}>
-          <p>
-            <a
-              href="/#"
-              onClick={(event,values) => {               
+            <CardTitle title={business_name} subtitle={business_category} />
+              <CardText>
+                <div>Services:<ul> {_.map(this.props.addService, service => {
+                  return ( 
+                    <li key={service.service_name}>
+                          {service.service_name} <br/>
+                          {service.service_duration}
+                      </li>
+                  )
+                })} </ul></div>
+                <div>Contact Number: {contact_no}</div>
+                <div>Opening Hours: {start_hour.toString()}</div>
+                <div>Closing Hours: {end_hour.toString()}</div>
+                <div>Non Working Days : <ul>{ 
+                    week_days
+                  // _.map(this.showDays, day => {
+                  //   <li key={day.value}>{day.name} </li>
+                  // })
+                }
+                </ul>
+                </div> 
+                <div>Address : {address}</div>
+                <div>Cancellation Policy Included: {cancel}</div>               
+              </CardText>
+            <CardActions>
+              <FlatButton label="Edit" onClick={(event, values) => {
                 event.preventDefault();
-                this.setState({stepIndex: 0, finished: false});
-   
-              }}
-            >
-              Click here
-            </a> to reset the example.
-          </p>
+                this.setState({ stepIndex: 0, finished: false });
+                }} 
+              />
+              <FlatButton label="Submit" onClick={handleSubmit(this.handleFinalSubmit.bind(this))} />
+            </CardActions>  
         </div>
       );
     }
@@ -412,8 +433,8 @@ class SetupBusinessForm extends React.Component {
                 label={stepIndex === 2 ? 'Finish' : 'Next'}
                 disabled={pristine || submitting}    
                 primary={true}
-              //  onClick={this.handleNext}
-                onClick={handleSubmit(this.handleNext.bind(this))}
+                onClick={this.handleNext}
+                //onClick={handleSubmit(this.handleNext.bind(this))}
                 
               />
             </div>
@@ -447,27 +468,24 @@ class SetupBusinessForm extends React.Component {
 
 function mapDispatchToProps(dispatch) {
   return {
-    setupBusiness: function(dispatch) {
-      setupBusiness(dispatch)
+    setupBusiness: setupBusiness
     }
   }
-}
 
 
-// Decorate with redux-form
+
+
 SetupBusinessForm = reduxForm({
-  form: 'SetupBusinessForm',validate
-   // a unique identifier for this form
+  form: 'SetupBusinessForm',
+  validate
+  
 })(SetupBusinessForm)
 
-// Decorate with connect to read form values
 const selector = formValueSelector('SetupBusinessForm') // <-- same as form name
 
 
 
-export default connect(state => { 
- // can select values individually
-   console.log('reduxstate',state);
+export default connect((state, ownProps) => { 
   const business_name = selector(state, 'business_name')
   const business_category = selector(state, 'business_category');
   const start_hour = selector(state, 'start_hour');
@@ -476,10 +494,8 @@ export default connect(state => {
   const contact_no = selector(state, 'contact_no');
   const address = selector(state, 'address');
   const cancel = selector(state, 'cancel');
-  const addService = selector(state, 'addService');
-  const service_name = selector(state, '0service_name');
-  const service_duration = selector(state,'0service_duration');
- 
+  const addService = selector(state, 'addService')
+  //console.log('hours',start_hour,end_hour)
   return {
     business_name,
     business_category,
@@ -489,10 +505,8 @@ export default connect(state => {
     contact_no,
     address,
     cancel,
-    addService,
-    service_name,
-    service_duration,
-    userData: state.userData
+    userData: state.userData,
+    addService
   }
 }
 ,mapDispatchToProps)(SetupBusinessForm)

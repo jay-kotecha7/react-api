@@ -21,8 +21,7 @@ class HomePage extends Component {
                 token: response.Zi.access_token,
             }
                 console.log('in response google');
-                this.props.createUser(data);
-                this.props.history.push("/home/select_role");
+                this.props.createUser(data,()=>{this.props.history.push("/home/select_role")});
             }
             
         var TxtType = function (el, toRotate, period) {

@@ -7,6 +7,9 @@ export const ADD_ROLE ='add_role'
 export const SET_CURRENT_USER='select_current_user';
 export const FETCH_USERS= 'fetch_user';
 export const SET_UP_BUS= 'set_up_bus';
+export const FETCH_BUSINESSES='fetch_businesses'
+export const SELECTED_BUSINESS='selected_business'
+export const CREATE_APP='create_app'
 const url=`http://localhost:1337`
 
 
@@ -16,24 +19,24 @@ export function setCurrentUser(user){
         user
     }
 }
-
-
-export function createUser(data) {
-   // console.log('in createUser', data);
-        const request = axios.post(`${url}/user/createUser`, data);
-        request.then(result => {
-          //  console.log('Call back for Create User , result data', result)
-            var jwt = result.data;
-            localStorage.setItem('jwtToken', jwt);
-            setAuthorizationToken(localStorage.jwtToken);
-           // console.log('Decoded Data', jwt_decode(jwt));
-            const pdata = jwt_decode(localStorage.jwtToken);
-            //return (dispatch)=>{
-            store.dispatch(setCurrentUser(pdata));
-            //    }
-        });
-
+export function setBusiness(result){
+    return {
+        type: SET_UP_BUS,
+        result
     }
+}
+
+
+export function createUser(data,callback) {
+    const request = axios.post(`${url}/user/createUser`, data);
+    request.then(result => {
+        var jwt = result.data;
+        localStorage.setItem('jwtToken', jwt);
+        setAuthorizationToken(localStorage.jwtToken);
+        const pdata = jwt_decode(localStorage.jwtToken);
+        store.dispatch(setCurrentUser(pdata));
+    },callback());
+}
 
 
 export function addRole(values){
@@ -58,23 +61,41 @@ export function fetchUser(id) {
         })
 }
 
-export function setupBusiness(data){
-   // console.log('before action data',data);
+export function setupBusiness(data,callback){
     const request = axios.post(`${url}/user/setupBusiness/${data.id}`,data);
-    request.then((result) => {
-      //  console.log('Business: ', result.data);
-        return {
-            type: SET_UP_BUS,
-            payload: result
-        }
-    })
+    request.then(result=>{
+        store.dispatch(setBusiness(result))
+        },callback());
 }
 
-export function logout(){
-    return dispatch => {
+export function logout(callback){
+    console.log('inside action/logout')
         localStorage.removeItem('jwtToken');
         setAuthorizationToken(false);
-       // this.props.history.push('/');
-        store.dispatch(setCurrentUser({}));
-    }
+        store.dispatch(setCurrentUser(),callback());
+
+}
+
+export function fetchBusinessList(value) {
+    const request = axios.get(`${url}/user/listOfBusiness/${value}`);
+    request.then( (result) => {
+        // return dispatch => dispatch({ type: FETCH_BUSINESSES, payload: result });
+        store.dispatch({
+        type: FETCH_BUSINESSES,
+        payload: result
+        })
+    })
+}
+     
+export function selectBusiness(business){
+    store.dispatch({ type: SELECTED_BUSINESS, payload: business });
+}
+
+export function createAppt(data) {
+    const request = axios.post(`${url}/appt/create`,data);
+        request.then( (result) => {
+            type: CREATE_APP
+            //push callback();
+        }
+    )
 }

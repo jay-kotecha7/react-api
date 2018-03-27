@@ -15,22 +15,22 @@ class SelectRoleContainer extends React.Component {
     super();
     this.state = {
       open: true,
-      value: 0,   
+      value: 0, 
     };
   }
 
-    componentWillMount(){
-      console.log('loginData ',this.props.userData)
-      this.props.fetchUser(this.props.userData.user.userId);
+    componentDidUpdate(){
+     console.log('userData ',this.props.userData)
     }
 
   handleClose = () => {
 
     switch (this.state.value) {
         case 1: {
-          var business_name = _.map(this.props.user, user1 => user1.business_name);
+         // var business_name = _.map(this.props.user, user1 => user1.business_name);
+         var { business_name } = this.props.user
           console.log('business_name: ',business_name);
-          if(business_name=='') {
+          if(business_name==null) {
             this.props.history.push('/provider/Business_Setup/set_business');
           }else {
             this.props.history.push('/home/Dummy');
@@ -53,14 +53,14 @@ class SelectRoleContainer extends React.Component {
       user_id:this.props.userData.user.userId,
       role_id: value,
     }
-
       this.props.addRole(data);
       this.setState({ value });
+      this.props.fetchUser(this.props.userData.user.userId);
   }
 
   render() {
 
-
+    
 
     const actions = [
       <FlatButton
