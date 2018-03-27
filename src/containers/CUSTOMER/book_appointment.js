@@ -96,7 +96,7 @@ class BookAppointment extends React.Component {
           {...custom} 
           autoOk={true} 
           floatingLabelText={label}
-          dateForm='MM/DD/YYYY' 
+        
           shouldDisableDate={this.disabledDate}
           minDate={ new Date()}
           value={ input.value !== '' ? input.value : null }
@@ -278,14 +278,14 @@ class BookAppointment extends React.Component {
                         Date And Time : {appointmentDate.toString()} &nbsp;&nbsp;{start_time}&nbsp;&nbsp;<div className="end_time">{end_time}</div><br/> 
                         Your Info : {customerName} &nbsp; {customerContact} &nbsp; {customerEmail} <br/>
                     </div>
-                    <RaisedButton
+                    {/* <RaisedButton
                               label="Edit"
                               primary={true}
                               onClick={event => {
                               event.preventDefault();
                               this.setState({ stepIndex: 0, finished: false });
                           }}
-                    />                      
+                    />                       */}
               </div>
             )
 
@@ -293,6 +293,7 @@ class BookAppointment extends React.Component {
   }
    handleFinalSubmit = (values) => {
      const { services } = this.props.business;
+     const { stepIndex } = this.state;
      let end_time;
       function convertHours(mins){
             var hour = Math.floor(mins/60);
@@ -325,6 +326,11 @@ class BookAppointment extends React.Component {
     // this.props.createAppt(data, () => {
     //   this.props.history.push("/home/Dummy");
     // });
+    this.setState({
+      loading: false,
+      stepIndex: stepIndex + 1,
+      finished: stepIndex >= 3
+    })
   };
   renderContent() {
     const { finished, stepIndex } = this.state;
@@ -334,9 +340,25 @@ class BookAppointment extends React.Component {
     if (finished) {
       //this.handleFinalSubmit.bind(this)
       return (
+        <div>
         <div> Your Appointment is Booked.</div>
-      )
+        <div>
+          <RaisedButton
+              disabled={stepIndex != 4}
+              label="BOOK ANOTHER APPOINTMENT"
+              primary={true}
+              onClick={event => { reset:true
+                event.preventDefault();
+                this.setState({stepIndex: 0 , finished: false});
+              }}
+              style={{ marginRight: 12 }}
+            />
+        </div>
+        </div>
+      );
     }
+
+
     return (
       <form>
         <div style={contentStyle}>
@@ -348,11 +370,24 @@ class BookAppointment extends React.Component {
               onClick={this.handlePrev}
               style={{ marginRight: 12 }}
             />
+
+            <RaisedButton
+              disabled={stepIndex != 3}
+              label="Edit"
+              primary={true}
+              onClick={event => {
+                event.preventDefault();
+                this.setState({ stepIndex: 0, finished: false });
+              }}
+              style={{ marginRight: 12 }}
+            />
             <RaisedButton
               label={stepIndex === 3 ? "Finish" : "Next"}
               primary={true}
               onClick={stepIndex === 3 ? handleSubmit(this.handleFinalSubmit.bind(this)) : this.handleNext}
+              //onClick={this.handleFinalSubmit}
             />
+            
           </div>
         </div>
       </form>
