@@ -31,9 +31,9 @@ class SelectRoleContainer extends React.Component {
          var { business_name } = this.props.user
           console.log('business_name: ',business_name);
           if(business_name==null) {
-            this.props.history.push('/provider/Business_Setup/set_business');
+            this.props.history.push('/provider/Business_Setup/set_business',this.props.user);
           }else {
-            this.props.history.push('/home/Dummy');
+            this.props.history.push('/home/Dummy',this.props.user);
           }
         break;
         }
@@ -73,20 +73,20 @@ class SelectRoleContainer extends React.Component {
 
     return (
       <div>
-        <Dialog
-          title="WHO ARE YOU?"
+        <Dialog 
+          title="Tell us who you are !"
           actions={actions}
           modal={false}
           open={this.state.open}
           onRequestClose={this.handleClose}
         >
           <SelectField
-            floatingLabelText="Select Role"
+            floatingLabelText="Business owner / Customer"
             value={this.state.value}
             onChange={this.handleChange}
           >
           <MenuItem value={0} primaryText="None" />
-          <MenuItem value={1} primaryText="Provider" />
+          <MenuItem value={1} primaryText="Business Owner" />
           <MenuItem value={2} primaryText="Customer" />
         </SelectField>
         </Dialog>

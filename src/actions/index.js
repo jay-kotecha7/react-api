@@ -10,6 +10,8 @@ export const SET_UP_BUS= 'set_up_bus';
 export const FETCH_BUSINESSES='fetch_businesses'
 export const SELECTED_BUSINESS='selected_business'
 export const CREATE_APP='create_app'
+export const FETCH_APPOINTMENTS='fetch_appointments'
+
 const url=`http://localhost:1337`
 
 
@@ -99,3 +101,10 @@ export function createAppt(data) {
         }
     )
 }
+export async function fetchAllAppointments(){
+    const request = axios.get(`${url}/appt/getAllAppointments`);
+    request.then( (result) => {
+    store.dispatch({ type: FETCH_APPOINTMENTS, payload: result });
+    } )
+     
+    }

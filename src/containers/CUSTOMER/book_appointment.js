@@ -14,10 +14,10 @@ import DatePicker from 'material-ui/DatePicker';
 import Paper from 'material-ui/Paper';
 import Dialog from 'material-ui/Dialog';
 import _ from 'lodash';
-import { Field, reduxForm,  formValueSelector } from "redux-form";
+import { Field, reduxForm,  formValueSelector, FieldArray } from "redux-form";
 import { connect } from 'react-redux'
 import moment from 'moment';
-import { fetchUser,createAppt } from '../../actions/index';
+import { fetchUser,createAppt,fetchAllAppointments } from '../../actions/index';
 import select_role from '../SELECT_ROLE/select_role';
 const style = {
   height: 100,
@@ -76,7 +76,28 @@ const renderSelectField = ({                                                    
         {...custom}                         //
         />
   )
- 
+
+  function convertHours(mins){
+    var hour = Math.floor(mins/60);
+    var mins = mins%60;
+    var converted = pad(hour, 2)+':'+pad(mins, 2);
+    return converted;
+  }
+
+  function pad (str, max) {
+    str = str.toString();
+    return str.length < max ? pad("0" + str, max) : str;
+  }
+
+  function intoMin(stringTime){
+      var hourMin = [];
+      var hourMin = stringTime.split(':');
+      var hour = parseInt(hourMin[0]);
+      var min =  parseInt(hourMin[1]);
+      var  hoursInMins = hour * 60;
+      return hoursInMins + min;
+    }
+
 class BookAppointment extends React.Component {
   state = {
     loading: false,
@@ -87,30 +108,48 @@ class BookAppointment extends React.Component {
   };
   componentWillMount() {
     this.props.fetchUser(this.props.userData.user.userId);
+    this.props.fetchAllAppointments();
   }
 
   renderDatePicker = ({ input, label, meta: { touched, error }, ...custom,props }) => {
+
+    
+
     return (
+    <div>
         <DatePicker 
           {...input} 
           {...custom} 
-          autoOk={true} 
           floatingLabelText={label}
-        
+          //onClick={() => fields.push({})}
           shouldDisableDate={this.disabledDate}
           minDate={ new Date()}
           value={ input.value !== '' ? input.value : null }
-          onChange={(event, value) => input.onChange(value)} 
+          onChange={(event, value) => input.onChange(value)}
         />
+        {/* { fields.map(() => (
+        <Field
+          name="start_time"
+          multiple={false}
+          label="Select Time"
+          component={renderSelectField}
+        > 
+         {this.menuItems(startTimeArr)}
+         
+        </Field>
+        ))} */}
+    </div>
       );
     };
+
     disabledDate = (date) => {
      // Can not select days before today
+
       const x = [];
       const { schedules } = this.props.business
       const week_days = schedules.map(schedule => schedule.week_days);
       const days = week_days.map(day=>{
-          for(let i=0;i<6;i++){
+          for(let i=0;i<7;i++){
           x[i] = _.nth(day,i)
        } 
        
@@ -148,11 +187,10 @@ class BookAppointment extends React.Component {
     }
   };
  
- 
-  menuItems(time) {                                                                   // for displaying the list of time slots
+   menuItems(time) {                                                                   // for displaying the list of time slots
     const {values} = this.state;
+   // if(appointmentDate){
     return time.map((day) => (
-      
       <MenuItem
         key={day}
         insetChildren={true}
@@ -161,22 +199,13 @@ class BookAppointment extends React.Component {
         primaryText={day}
       />
     ));
-  }
-  
+  //}
+}
+
   getStepContent(stepIndex) {
     const { services } = this.props.business;
     let { name: customerName, email: customerEmail } = this.props.customer;
-
-       function convertHours(mins){
-            var hour = Math.floor(mins/60);
-            var mins = mins%60;
-            var converted = pad(hour, 2)+':'+pad(mins, 2);
-            return converted;
-          }
-          function pad (str, max) {
-            str = str.toString();
-            return str.length < max ? pad("0" + str, max) : str;
-          }
+    const { appointmentDate,datepickerdate } = this.props
 
     switch (stepIndex) {
       case 0:        
@@ -203,21 +232,52 @@ class BookAppointment extends React.Component {
           </div>
         );
       case 1:
-          const { schedules } = this.props.business;
-          
-          const start = schedules.map(( schedule) => schedule.start_hour), end = schedules.map((schedule)=>schedule.end_hour);
-          var total_start= (new Date(start).getHours() * 60) + (new Date(start).getMinutes());
-          var total_end= (new Date(end).getHours() * 60) + (new Date(end).getMinutes());
-          var interval = 30;
-          function calculate_time_slot(total_start,total_end, interval = "30"){
-            var time_slots = new Array();
-            for(var i=total_start; i<=total_end; i = i+interval){
+        const { schedules } = this.props.business;
+        const {datepickerdate } = this.props;
+        console.log('schedules',schedules)
+        console.log('appointments', this.props.appointment)
+        console.log('datepickerdate',datepickerdate)
+        const start = schedules.map(( schedule) => schedule.start_hour), end = schedules.map((schedule)=>schedule.end_hour);
+        var total_start= (new Date(start).getHours() * 60) + (new Date(start).getMinutes());
+        var total_end= (new Date(end).getHours() * 60) + (new Date(end).getMinutes());
+        var interval = 30;
+        function calculate_time_slot(total_start,total_end, interval = "30"){
+          var time_slots = new Array();
+          for(var i=total_start; i<=total_end; i = i+interval){
             time_slots.push(convertHours(i));
-            }
-            return time_slots;
-          }
-          var startTimeArr = calculate_time_slot(total_start,total_end, interval );
-        return (
+          } 
+        return time_slots;
+        console.log('slot',time_slots)
+        }
+        var startTimeArr = calculate_time_slot(total_start,total_end, interval);
+        // var selectedStartTimeArr = new Array();
+        // var selectedEndTimeArr = new Array();
+        // var newArray = new Array();
+        // var diff = new Array();
+      //   function compareArray(){
+      //     console.log('startTimeArr',startTimeArr)
+      //       for(let i=0;i<selectedStartTimeArr.length;i++){
+      //         for(let j=0;j<selectedEndTimeArr.length;j++){
+      //           console.log(selectedEndTimeArr[j] - selectedStartTimeArr[i]);
+      //         }
+      //       }
+      //     console.log('diff',diff)
+      //     for(let j=0;j<startTimeArr.length;j++){
+      //       for(let k=0;k<selectedStartTimeArr.length;k++){
+      //         if(startTimeArr[j]==selectedStartTimeArr[k]){
+      //           console.log('value of start time and selected start time , i, j',startTimeArr[j],selectedStartTimeArr[k],j,k)
+      //         if(diff>30){
+      //           startTimeArr.splice(j,1);
+      //           console.log('spliced value',startTimeArr);
+      //         }else{
+      //           console.log('inside else')
+      //         }
+      //         console.log('newArray',newArray);
+      //       }
+      //     }
+      //   }
+      // }
+      return (
           <div>
             <div>
               <Field
@@ -225,8 +285,37 @@ class BookAppointment extends React.Component {
                 label="Select Date"
                 component={this.renderDatePicker}
               />
+            {   // Creating array of startTime and endTIme of the booked appointments
+                _.map( this.props.appointment, appt => {
+                  var date1 = new Date(appointmentDate).getDate();
+                  var date2 = new Date(appt.appointmentDate).getDate();
+                  var displayArray = new Array();
+                  console.log('selected Date',date1);
+                  console.log('Dates from the appt table',date2)
+                  console.log('appt: ',appt)
+                  if(date1===date2) {
+                    console.log('matched')
+                    if(appt.status==='booked') {                    
+                      var selectedStartTimeArr = appt.start_time;
+                      var selectedEndTimeArr = appt.end_time;
+                      console.log('start time, end time',selectedStartTimeArr,selectedEndTimeArr);
+                      var diff = intoMin(selectedEndTimeArr) - intoMin(selectedStartTimeArr);
+                      console.log('diff',diff)
+                      if(diff>interval){
+                        var x = (Math.floor(diff/interval))+ 1 ;
+                        console.log('index value of',startTimeArr.indexOf(selectedStartTimeArr));
+                        startTimeArr.splice(startTimeArr.indexOf(selectedStartTimeArr),x);
+                        console.log('spliced array',startTimeArr)
+                      } else{
+                          console.log('inside else');
+                        }  
+                    }
+                  }                 
+                })            
+              }
+               {/* {compareArray()} */}
             </div>
-         
+                {/* {console.log('New Array', newArray)} */}
             <div>
               <Field
                 name="start_time"
@@ -254,7 +343,7 @@ class BookAppointment extends React.Component {
           </div>;
       case 3:
         const { business_name,business_category } = this.props.business;
-        const { appointmentDate,selected_service,start_time } = this.props;
+        const { selected_service,start_time } = this.props;
         const { contact_no: customerContact } = this.props;
         let displayServiceName;
         let displayServiceDuration;
@@ -347,10 +436,11 @@ class BookAppointment extends React.Component {
               disabled={stepIndex != 4}
               label="BOOK ANOTHER APPOINTMENT"
               primary={true}
-              onClick={event => { reset:true
-                event.preventDefault();
-                this.setState({stepIndex: 0 , finished: false});
-              }}
+              // onClick={event => { reset:true
+              //   event.preventDefault();
+              //   this.setState({stepIndex: 0 , finished: false});
+              // }}
+              onClick={(event)=>{this.props.history.push('/customer/customer_dashboard/customer_homepage')}}
               style={{ marginRight: 12 }}
             />
         </div>
@@ -429,6 +519,7 @@ function mapDispatchToProps(dispatch) {
   return {
     fetchUser: fetchUser,
     createAppt:createAppt,
+    fetchAllAppointments:fetchAllAppointments
   }
 }
 BookAppointment = reduxForm({
@@ -445,15 +536,18 @@ export default connect(state => {
   const time_slot = selector(state,'time_slot');
   const start_time = selector(state,'start_time');
   const contact_no = selector(state,'contact_no');
+  const datepickerdate = selector(state, 'datepicker');
  
   return {
     business:state.business,
     userData: state.userData,
     customer: state.user,
+    appointment:state.appointment,
     selected_service,
     appointmentDate,
     start_time,
     contact_no,
+    datepickerdate
 
   };
 }, mapDispatchToProps)(BookAppointment);

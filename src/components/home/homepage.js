@@ -102,12 +102,13 @@ class HomePage extends Component {
                             <span className="wrap">Business</span>
                         </span>
                         <br />Anywhere
+                        <h2>Free customer appointment scheduling</h2>
                     </h1>
-
+                   
                 </div>
-
+                
                 <div className="overlay">
-                    <div className="signIn" align="center">
+                                    <div className="signIn" align="center">
                         <GoogleLogin
                             clientId="444898618193-thmlidkh4vjnpf9napj857c0tqeb6atk.apps.googleusercontent.com"
                             buttonText="Google"

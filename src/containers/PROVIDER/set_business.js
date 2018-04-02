@@ -62,13 +62,13 @@ const renderSelectField = ({                                                    
 )
 
 const days = [                                                                          // List of Days
-  {value:0, name:'Monday'},
-  {value:1, name:'Tuesday'},
-  {value:2, name:'Wednesday'},
-  {value:3, name:'Thursday'},
-  {value:4, name:'Friday'},
-  {value:5, name:'Saturday'},
-  {value:6, name:'Sunday'},
+  {value:0, name:'Sunday'},
+  {value:1, name:'Monday'},
+  {value:2, name:'Tuesday'},
+  {value:3, name:'Wednesday'},
+  {value:4, name:'Thursday'},
+  {value:5, name:'Friday'},
+  {value:6, name:'Saturday'},
 ];
 
 class SetupBusinessForm extends React.Component {
@@ -237,7 +237,7 @@ class SetupBusinessForm extends React.Component {
                   <Field
                     name="business_category"
                     component={renderSelectField}
-                    label="Business Category"
+                    label="Choose Industry"
                   > 
                     <MenuItem value="Clinic" primaryText="Clinic" />
                     <MenuItem value="Law" primaryText="Law Firm" />
@@ -249,8 +249,8 @@ class SetupBusinessForm extends React.Component {
                 <div>
                 <Field
                   name="start_hour"
-                  label="Start Hour"
-                  floatingLabelText="Start Hour"
+                  label="When do you open ?"
+                  floatingLabelText="When do you open ?"
                   component={this.renderTimePicker}
                   //onClick={this.handleStartTime}
                   minutesStep={30}
@@ -260,8 +260,8 @@ class SetupBusinessForm extends React.Component {
               <div>
               <Field
                   name="end_hour"
-                  label="End Hour"
-                  floatingLabelText="End Hour"
+                  label="When do you close ?"
+                  floatingLabelText="When do you close ?"
                   component={this.renderTimePicker}
                   minutesStep={30}
                 />
@@ -288,7 +288,7 @@ class SetupBusinessForm extends React.Component {
                     name="contact_no"
                     component={this.renderTextField}
                     validate={[number,maxLength15,minLength10]}
-                    label="Contact Number"
+                    label="Business Phone"
                   />
               </div>
               <div>
@@ -296,7 +296,7 @@ class SetupBusinessForm extends React.Component {
                     name="address"
                     component={this.renderTextField}
                     validate={[minAddress10]}
-                    label="Address"
+                    label="Business Address"
                   />
               </div>
             </div>
@@ -308,9 +308,9 @@ class SetupBusinessForm extends React.Component {
         return (
           <div>
             {/* <TextField style={{marginTop: 0}} floatingLabelText="Ad group name" /> */}
-            <p>
+            <h4>
               Please tell us about your Services
-            </p>
+            </h4>
             <FieldArray
               name="addService"
               //type="text"
@@ -319,7 +319,7 @@ class SetupBusinessForm extends React.Component {
             />
            
             <br />
-            <p>Something something whatever cool</p>
+            <p>Something whatever cool</p>
           </div>
         );
 
@@ -446,21 +446,27 @@ class SetupBusinessForm extends React.Component {
   render() {
     const {loading, stepIndex} = this.state;
     return (
-      <div style={{width: '100%', maxWidth: 700, margin: 'auto'}}>
-        <Stepper activeStep={stepIndex}>
-          <Step>
-            <StepLabel>Business Details</StepLabel>
-          </Step>
-          <Step>
-            <StepLabel>Service Details</StepLabel>
-          </Step>
-          <Step>
-            <StepLabel>Cancellation Policy</StepLabel>
-          </Step>
-        </Stepper>
-        <ExpandTransition loading={loading} open={true}>
-          {this.renderContent()}
-        </ExpandTransition>
+      <div>
+        <div style={{width: '100%', maxWidth: 700, margin: 'auto'}}>
+          <h3>Looks like you are new here, Let's register your Business !!</h3>
+        </div>
+
+        <div style={{width: '100%', maxWidth: 700, margin: 'auto'}}>
+          <Stepper activeStep={stepIndex}>
+            <Step>
+              <StepLabel>Business Details</StepLabel>
+            </Step>
+            <Step>
+              <StepLabel>Service Details</StepLabel>
+            </Step>
+            <Step>
+              <StepLabel>Cancellation Policy</StepLabel>
+            </Step>
+          </Stepper>
+          <ExpandTransition loading={loading} open={true}>
+            {this.renderContent()}
+          </ExpandTransition>
+        </div>
       </div>
     );
   }

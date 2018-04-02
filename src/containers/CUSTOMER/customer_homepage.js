@@ -20,6 +20,10 @@ class CustomerHomepage extends React.Component {
     };
   }
 
+  componentDidUpdate(){
+    console.log('business data',this.props.business)
+  }
+
   handleChange = (event, index, value) => {
     this.setState({ value });
     this.props.fetchBusinessList(value);
@@ -68,16 +72,18 @@ class CustomerHomepage extends React.Component {
           {/* <MenuItem value={5} primaryText="Weekly" /> */}
         </DropDownMenu>
 
-        {this.state.openBusinessMenu && <ul className="list-group">
+        {
+          this.state.openBusinessMenu && <ul className="list-group">
             {this.renderBusinesses()}
-          </ul>}
+          </ul>
+        }
       </div>;
   }
 }
 
 function mapStateToProps(state) {
     return {
-        business:state.business
+        business: state.business
     }
 }
 
