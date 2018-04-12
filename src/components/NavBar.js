@@ -92,19 +92,22 @@ class NavigationBar extends React.Component{
                         disabled={true}
                         leftAvatar={
                             <div> 
-                            <Avatar  align='center'
-                                src="https://lh5.googleusercontent.com/-mVFhOS_bgM4/AAAAAAAAAAI/AAAAAAAAAAA/AGi4gfwq7tYj6miPiJueX21S5cHfDzav8g/s96-c/photo.jpg"
-                                size={60}
-                                style={style.avatar}
-                            />
-                         </div>   
+                                <Avatar  align='center'
+                                    src="https://lh5.googleusercontent.com/-mVFhOS_bgM4/AAAAAAAAAAI/AAAAAAAAAAA/AGi4gfwq7tYj6miPiJueX21S5cHfDzav8g/s96-c/photo.jpg"
+                                    size={60}
+                                    style={style.avatar}
+                                />
+                            </div>   
                         }
                     >
                     </ListItem>
+
                     <br />
                     <br />
-                   <div> <ListItem primaryText="" leftIcon={<ContentInbox />} /> </div>
-                    <div> <ListItem primaryText="" leftIcon={<ActionGrade />} /> </div>
+                    <div>
+                        <ListItem primaryText="My Bookings" leftIcon={<ContentInbox />} />
+                        <ListItem primaryText="Edit Profile" leftIcon={<ActionGrade />} />
+                    </div>
                 </List>
             </div>
         

@@ -112,11 +112,8 @@ class BookAppointment extends React.Component {
   }
 
   renderDatePicker = ({ input, label, meta: { touched, error }, ...custom,props }) => {
-
-    
-
     return (
-    <div>
+      <div>
         <DatePicker 
           {...input} 
           {...custom} 
@@ -127,20 +124,9 @@ class BookAppointment extends React.Component {
           value={ input.value !== '' ? input.value : null }
           onChange={(event, value) => input.onChange(value)}
         />
-        {/* { fields.map(() => (
-        <Field
-          name="start_time"
-          multiple={false}
-          label="Select Time"
-          component={renderSelectField}
-        > 
-         {this.menuItems(startTimeArr)}
-         
-        </Field>
-        ))} */}
     </div>
-      );
-    };
+  );
+};
 
     disabledDate = (date) => {
      // Can not select days before today
@@ -250,33 +236,7 @@ class BookAppointment extends React.Component {
         console.log('slot',time_slots)
         }
         var startTimeArr = calculate_time_slot(total_start,total_end, interval);
-        // var selectedStartTimeArr = new Array();
-        // var selectedEndTimeArr = new Array();
-        // var newArray = new Array();
-        // var diff = new Array();
-      //   function compareArray(){
-      //     console.log('startTimeArr',startTimeArr)
-      //       for(let i=0;i<selectedStartTimeArr.length;i++){
-      //         for(let j=0;j<selectedEndTimeArr.length;j++){
-      //           console.log(selectedEndTimeArr[j] - selectedStartTimeArr[i]);
-      //         }
-      //       }
-      //     console.log('diff',diff)
-      //     for(let j=0;j<startTimeArr.length;j++){
-      //       for(let k=0;k<selectedStartTimeArr.length;k++){
-      //         if(startTimeArr[j]==selectedStartTimeArr[k]){
-      //           console.log('value of start time and selected start time , i, j',startTimeArr[j],selectedStartTimeArr[k],j,k)
-      //         if(diff>30){
-      //           startTimeArr.splice(j,1);
-      //           console.log('spliced value',startTimeArr);
-      //         }else{
-      //           console.log('inside else')
-      //         }
-      //         console.log('newArray',newArray);
-      //       }
-      //     }
-      //   }
-      // }
+
       return (
           <div>
             <div>
@@ -295,7 +255,7 @@ class BookAppointment extends React.Component {
                   console.log('appt: ',appt)
                   if(date1===date2) {
                     console.log('matched')
-                    if(appt.status==='booked') {                    
+                    if(appt.status==='booked'){                    
                       var selectedStartTimeArr = appt.start_time;
                       var selectedEndTimeArr = appt.end_time;
                       console.log('start time, end time',selectedStartTimeArr,selectedEndTimeArr);
@@ -306,9 +266,11 @@ class BookAppointment extends React.Component {
                         console.log('index value of',startTimeArr.indexOf(selectedStartTimeArr));
                         startTimeArr.splice(startTimeArr.indexOf(selectedStartTimeArr),x);
                         console.log('spliced array',startTimeArr)
-                      } else{
-                          console.log('inside else');
-                        }  
+                      }
+                      else if(diff<=interval){
+                          startTimeArr.splice(startTimeArr.indexOf(selectedStartTimeArr),1);
+                      }
+                      else{console.log('in else')}
                     }
                   }                 
                 })            
